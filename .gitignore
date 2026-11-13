@@ -1,0 +1,18 @@
+# Python / Umgebung
+.venv/
+__pycache__/
+*.pyc
+
+# Build-Ergebnisse (kommen als Release-Datei auf GitHub, nicht ins Repo)
+dist/
+build/
+packaging/cache/
+
+# nur lokal (persönliche Verknüpfungen)
+installieren-lokal.ps1
+
+# Windows / Editoren
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
