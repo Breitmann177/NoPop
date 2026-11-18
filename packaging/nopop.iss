@@ -1,4 +1,4 @@
-; NoPop Setup – one double-click, no admin rights.
+﻿; NoPop Setup – one double-click, no admin rights.
 ; Build: python packaging/build.py, then  iscc /DVersion=x.y.z packaging\nopop.iss
 #ifndef Version
   #define Version "0.0.0"
@@ -26,10 +26,17 @@ UninstallDisplayName=NoPop
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
+VersionInfoProductName=NoPop
+VersionInfoVersion={#Version}
+VersionInfoDescription=NoPop Setup
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+
+[Messages]
+en.FinishedLabel=NoPop is installed. It sits in the system tray and starts with Windows – you can turn that off in NoPop. No data is sent anywhere.
+de.FinishedLabel=NoPop ist installiert. Es sitzt im Infobereich und startet mit Windows – das kannst du in NoPop abschalten. Es werden keine Daten gesendet.
 
 [Files]
 Source: "..\dist\NoPop\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion; Excludes: "Install.cmd,install.ps1"

@@ -76,6 +76,15 @@ das Ploppen tritt aber meist nur bei eingebauten Lautsprechern auf.
 
 Siehe [englisches README](README.md#build-from-source).
 
+## Code signing policy
+
+Kostenlose Code-Signatur von [SignPath.io](https://about.signpath.io), Zertifikat von [SignPath Foundation](https://signpath.org)
+*(Antrag läuft – aktuelle Versionen sind noch nicht signiert)*.
+
+- Committer, Reviewer und Freigabe: [Breitmann177](https://github.com/Breitmann177)
+- Jede Version wird automatisch per [GitHub Actions](.github/workflows/release.yml) aus diesem Repository gebaut und von Hand freigegeben.
+- Datenschutz: siehe [PRIVACY.md](PRIVACY.md) – NoPop sendet keine Daten.
+
 ## Lizenz
 
 [MIT](LICENSE) – frei nutzbar, veränderbar und weitergebbar.

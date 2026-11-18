@@ -95,6 +95,15 @@ opop.iss   # build dist/NoPop-Setup.exe (Inno Setup 6)
 
 Releases are built by GitHub Actions: bump `VERSION`, push a tag `vX.Y.Z`.
 
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
+*(application in progress – current releases are not signed yet)*.
+
+- Committers, reviewers and approvers: [Breitmann177](https://github.com/Breitmann177)
+- Every release is built automatically by [GitHub Actions](.github/workflows/release.yml) from this repository and approved by hand.
+- Privacy: see [PRIVACY.md](PRIVACY.md) – NoPop sends no data anywhere.
+
 ## License
 
 [MIT](LICENSE) – free to use, change and share.
