@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases/latest"><b>⬇ Download</b></a> ·
+  <a href="../../releases/latest/download/NoPop-Setup.exe"><b>⬇ Download NoPop for Windows</b></a> ·
   <a href="README.de.md">Deutsch</a>
 </p>
 
@@ -46,16 +46,15 @@ When nothing has played for that long, NoPop lets the speakers sleep again and w
 
 ## Install
 
-1. Download `NoPop-x.y.z-windows-x64.zip` from the [latest release](../../releases/latest).
-2. Right-click the zip → **Extract All**.
-3. Double-click **`Install.cmd`** in the extracted folder.
+**[⬇ Download NoPop-Setup.exe](../../releases/latest/download/NoPop-Setup.exe)** → double-click → done.
 
-No admin rights needed. NoPop installs to `%LOCALAPPDATA%\Programs\NoPop`, adds a Start menu entry and opens.
-You'll find its icon in the system tray (click the **^** arrow next to the clock).
+No admin rights, no extra software. NoPop opens and sits in the system tray (click **^** next to the clock).
 
-**"Windows protected your PC"?** NoPop isn't signed with a paid certificate, so Windows may warn you about the
-install script. Click **More info → Run anyway**. Everything NoPop runs is in this repository, and the bundled
-Python runtime is the official one from python.org, signed by the Python Software Foundation.
+**"Windows protected your PC"?** Click **More info → Run anyway**. NoPop is free and not signed with a paid
+certificate; all its code is in this repository.
+
+**Blocked by Smart App Control?** Download the ZIP from the [latest release](../../releases/latest) instead,
+right-click → **Extract All**, double-click **`Install.cmd`**. It only runs the official, signed Python from python.org.
 
 ## Uninstall
 
@@ -80,6 +79,8 @@ Requires Windows 10/11 and Python 3.12 (64-bit) from python.org.
 ```
 python nopop.py                 # run directly (uses only the standard library)
 python packaging/build.py       # build dist/NoPop-<version>-windows-x64.zip
+iscc /DVersion=x.y.z packaging
+opop.iss   # build dist/NoPop-Setup.exe (Inno Setup 6)
 ```
 
 `logo.py` regenerates the icons (needs Pillow). The `tests/` folder contains small manual checks.
@@ -90,7 +91,9 @@ python packaging/build.py       # build dist/NoPop-<version>-windows-x64.zip
 | `kern.py` | sound detection (Windows audio meter via COM) and the inaudible keep-awake tone |
 | `tray.py` | tray icon via the Windows API |
 | `texte.py` | German / English texts |
-| `packaging/` | build script, installer, uninstaller |
+| `packaging/` | build script, Setup (Inno Setup), ZIP installer |
+
+Releases are built by GitHub Actions: bump `VERSION`, push a tag `vX.Y.Z`.
 
 ## License
 

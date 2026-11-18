@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases/latest"><b>⬇ Download</b></a> ·
+  <a href="../../releases/latest/download/NoPop-Setup.exe"><b>⬇ NoPop für Windows herunterladen</b></a> ·
   <a href="README.md">English</a>
 </p>
 
@@ -46,17 +46,15 @@ Kommt so lange kein Ton, dürfen die Lautsprecher wieder schlafen, und NoPop war
 
 ## Installieren
 
-1. `NoPop-x.y.z-windows-x64.zip` aus dem [neuesten Release](../../releases/latest) herunterladen.
-2. Rechtsklick auf die ZIP-Datei → **Alle extrahieren**.
-3. Im entpackten Ordner **`Install.cmd`** doppelklicken.
+**[⬇ NoPop-Setup.exe herunterladen](../../releases/latest/download/NoPop-Setup.exe)** → doppelklicken → fertig.
 
-Keine Admin-Rechte nötig. NoPop wird nach `%LOCALAPPDATA%\Programs\NoPop` installiert, bekommt einen
-Startmenü-Eintrag und öffnet sich. Das Symbol findest du im Infobereich (Pfeil **^** neben der Uhr).
+Keine Admin-Rechte, keine Zusatzsoftware. NoPop öffnet sich und sitzt im Infobereich (Pfeil **^** neben der Uhr).
 
-**„Der Computer wurde durch Windows geschützt“?** NoPop ist nicht mit einem kostenpflichtigen Zertifikat signiert,
-deshalb kann Windows beim Installationsskript warnen. Auf **Weitere Informationen → Trotzdem ausführen** klicken.
-Alles, was NoPop ausführt, steht in diesem Repository, und das mitgelieferte Python ist das offizielle von
-python.org, signiert von der Python Software Foundation.
+**„Der Computer wurde durch Windows geschützt“?** Auf **Weitere Informationen → Trotzdem ausführen** klicken.
+NoPop ist kostenlos und nicht mit einem bezahlten Zertifikat signiert; der ganze Code steht in diesem Repository.
+
+**Von Smart App Control blockiert?** Stattdessen die ZIP aus dem [neuesten Release](../../releases/latest) laden,
+Rechtsklick → **Alle extrahieren**, **`Install.cmd`** doppelklicken. Das startet nur das offizielle, signierte Python von python.org.
 
 ## Deinstallieren
 
