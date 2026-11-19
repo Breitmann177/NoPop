@@ -10,9 +10,16 @@
 </p>
 
 <p align="center">
-  <a href="../../releases/latest/download/NoPop-Setup.exe"><b>⬇ NoPop für Windows herunterladen</b></a> ·
   <a href="README.md">English</a>
 </p>
+
+<p align="center">
+  <a href="https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Setup.exe"><img src="https://img.shields.io/badge/%E2%86%93%20Windows-0078D4?style=for-the-badge" alt="Download für Windows"></a>
+  &nbsp;
+  <a href="https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Linux.tar.gz"><img src="https://img.shields.io/badge/%E2%86%93%20Linux-E95420?style=for-the-badge" alt="Download für Linux"></a>
+</p>
+
+<p align="center"><sub><b>Windows:</b> <code>NoPop-Setup.exe</code> doppelklicken &nbsp;·&nbsp; <b>Linux:</b> entpacken → <code>./install.sh</code></sub></p>
 
 ---
 
@@ -46,20 +53,36 @@ Kommt so lange kein Ton, dürfen die Lautsprecher wieder schlafen, und NoPop war
 
 ## Installieren
 
-**[⬇ NoPop-Setup.exe herunterladen](../../releases/latest/download/NoPop-Setup.exe)** → doppelklicken → fertig.
+### Windows
+
+**[⬇ NoPop-Setup.exe herunterladen](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Setup.exe)** → doppelklicken → fertig.
 
 Keine Admin-Rechte, keine Zusatzsoftware. NoPop öffnet sich und sitzt im Infobereich (Pfeil **^** neben der Uhr).
 
 **„Der Computer wurde durch Windows geschützt“?** Auf **Weitere Informationen → Trotzdem ausführen** klicken.
 NoPop ist kostenlos und nicht mit einem bezahlten Zertifikat signiert; der ganze Code steht in diesem Repository.
 
-**Von Smart App Control blockiert?** Stattdessen die ZIP aus dem [neuesten Release](../../releases/latest) laden,
+**Von Smart App Control blockiert?** Stattdessen [NoPop-Windows.zip](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Windows.zip) laden,
 Rechtsklick → **Alle extrahieren**, **`Install.cmd`** doppelklicken. Das startet nur das offizielle, signierte Python von python.org.
+
+### Linux
+
+[NoPop-Linux.tar.gz](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Linux.tar.gz) laden, entpacken, im Ordner ein Terminal öffnen und starten:
+
+```bash
+./install.sh
+```
+
+Installiert nur für deinen Benutzer (ohne root), legt NoPop ins App-Menü und startet es. Fehlen Python/Tkinter
+oder `pactl`, bietet es an, sie zu installieren. Läuft mit PipeWire und PulseAudio. Unter Linux gibt es kein
+Tray-Symbol: Fenster schließen = NoPop läuft weiter, wieder öffnen über das App-Menü.
 
 ## Deinstallieren
 
 **Einstellungen → Apps → Installierte Apps → NoPop → Deinstallieren.** Entfernt Programm, Autostart,
 Startmenü-Eintrag und Einstellungen.
+
+**Linux:** `~/.local/share/nopop/uninstall.sh` ausführen.
 
 ## Häufige Fragen
 

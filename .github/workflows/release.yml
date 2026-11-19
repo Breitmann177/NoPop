@@ -1,4 +1,4 @@
-# New version: update VERSION, then push a tag like v1.1.0 – GitHub builds and publishes the release.
+# New version: update VERSION, then push a tag like v1.2.0 – GitHub builds, tests and publishes the release.
 name: Release
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,29 +23,63 @@ jobs:
         run: |
           $v = (Get-Content VERSION -Raw).Trim()
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DVersion=$v" packaging\nopop.iss
-          Get-FileHash dist\NoPop-Setup.exe, dist\NoPop-$v-windows-x64.zip | Format-List
+          Move-Item "dist\NoPop-$v-windows-x64.zip" dist\NoPop-Windows.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: NoPop
+          name: windows
           path: |
             dist/NoPop-Setup.exe
-            dist/NoPop-*-windows-x64.zip
+            dist/NoPop-Windows.zip
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test with a virtual sound card
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq pulseaudio pulseaudio-utils
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=test
+          pactl set-default-sink test
+          python3 tests/linux_test.py
+      - name: Build tar.gz
+        run: |
+          mkdir -p pkg/NoPop/assets
+          cp nopop.py kern.py kern_linux.py system_linux.py texte.py VERSION LICENSE pkg/NoPop/
+          cp packaging/linux/install.sh packaging/linux/uninstall.sh pkg/NoPop/
+          cp assets/logo-512.png pkg/NoPop/assets/
+          chmod +x pkg/NoPop/*.sh
+          tar -C pkg -czf NoPop-Linux.tar.gz NoPop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: NoPop-Linux.tar.gz
+
+  release:
+    needs: [windows, linux]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: out
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/')
-        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $v = (Get-Content VERSION -Raw).Trim()
-          $notes = @"
-          ### Download
-          **[NoPop-Setup.exe](https://github.com/${{ github.repository }}/releases/latest/download/NoPop-Setup.exe)** → double-click → done. No admin rights needed.
+          v=$(tr -d '[:space:]' < VERSION)
+          r="https://github.com/${{ github.repository }}/releases/latest/download"
+          cat > notes.md <<NOTES
+          | | Download | Install |
+          |---|---|---|
+          | **Windows** | [NoPop-Setup.exe]($r/NoPop-Setup.exe) | double-click → done |
+          | **Linux** | [NoPop-Linux.tar.gz]($r/NoPop-Linux.tar.gz) | extract → \`./install.sh\` |
 
-          If Windows says *"Windows protected your PC"*: **More info → Run anyway** (NoPop is free and not signed with a paid certificate).
-          Setup blocked by *Smart App Control*? Use the ZIP instead: extract → double-click **Install.cmd**.
+          **Windows:** if you see *"Windows protected your PC"*, click **More info → Run anyway** (NoPop is free and not signed with a paid certificate). Blocked by *Smart App Control*? Use **NoPop-Windows.zip**: extract → double-click **Install.cmd**.
 
-          **Deutsch:** Setup herunterladen → doppelklicken → fertig. Bei der Windows-Warnung: **Weitere Informationen → Trotzdem ausführen**.
-
-          Uninstall: Settings → Apps → NoPop.
-          "@
-          gh release create $env:GITHUB_REF_NAME dist/NoPop-Setup.exe "dist/NoPop-$v-windows-x64.zip" --title "NoPop $v" --notes $notes
+          **Deutsch:** Windows: Setup doppelklicken (bei der Warnung **Weitere Informationen → Trotzdem ausführen**). Linux: entpacken → \`./install.sh\` im Terminal.
+          NOTES
+          sed -i 's/^          //' notes.md
+          gh release create "$GITHUB_REF_NAME" out/* --title "NoPop $v" --notes-file notes.md

@@ -20,7 +20,7 @@ URL = f"https://www.python.org/ftp/python/{PY}/{EMBED}"
 CACHE = os.path.join(HIER, "cache")
 DIST = os.path.join(WURZEL, "dist")
 ZIEL = os.path.join(DIST, "NoPop")
-APP_DATEIEN = ["nopop.py", "kern.py", "tray.py", "texte.py", "VERSION", "LICENSE"]
+APP_DATEIEN = ["nopop.py", "kern.py", "kern_win.py", "tray.py", "texte.py", "VERSION", "LICENSE"]
 
 
 def laden():

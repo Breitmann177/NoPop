@@ -3,25 +3,32 @@
 Leicht gebaut: nur Python-Standardbibliothek. Im Hintergrund laufen nur
 Tray-Symbol und Wächter (2 Messungen pro Sekunde). Das Fenster wird erst
 beim Öffnen geladen und beim Schließen wieder freigegeben.
-Start mit --versteckt öffnet kein Fenster (für den Windows-Autostart).
+Start mit --versteckt öffnet kein Fenster (für den Autostart).
+Läuft unter Windows und Linux (Linux-Teile in kern_linux.py / system_linux.py).
 """
 import ctypes
-import ctypes.wintypes
 import gc
 import json
 import os
 import queue
 import sys
 import threading
-import winreg
 
 from kern import Waechter
 from texte import t
-from tray import Tray
+
+WIN = sys.platform == "win32"
+if WIN:
+    import winreg
+    from tray import Tray
+else:
+    import system_linux as lx
+    from system_linux import Tray
 
 APP = "NoPop"
 HIER = os.path.dirname(os.path.abspath(__file__))
-ORDNER = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), APP)
+ORDNER = os.path.join(os.environ.get("APPDATA") or os.environ.get("XDG_CONFIG_HOME")
+                      or os.path.expanduser("~/.config"), APP)
 DATEI = os.path.join(ORDNER, "einstellungen.json")
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 MAX_MIN = 240
@@ -38,6 +45,8 @@ def asset(name):
 
 def taskleiste():
     """'hell' oder 'dunkel' – passend dazu wird das Tray-Symbol gewählt."""
+    if not WIN:
+        return "dunkel"
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                             r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize") as k:
@@ -137,6 +146,17 @@ def autostart_setzen(an):
     _run_eintrag_entfernen(APP)
 
 
+if not WIN:
+    autostart_an, autostart_setzen = lx.autostart_an, lx.autostart_setzen
+
+
+def autostart_veraltet():
+    """True, wenn der Autostart noch auf einen alten Ort von NoPop zeigt."""
+    if not WIN:
+        return not lx.autostart_aktuell()
+    return os.path.abspath(__file__) not in _schtasks("/Query", "/TN", AUFGABE, "/XML").stdout
+
+
 def _run_eintrag_entfernen(name):
     """Alten Run-Eintrag löschen. True, wenn einer da war."""
     try:
@@ -149,14 +169,17 @@ def _run_eintrag_entfernen(name):
 
 
 # ---------------------------------------------------------------- Nur eine Instanz
-k32 = ctypes.windll.kernel32
-k32.CreateEventW.restype = ctypes.c_void_p
-k32.OpenEventW.restype = ctypes.c_void_p
+if WIN:
+    k32 = ctypes.windll.kernel32
+    k32.CreateEventW.restype = ctypes.c_void_p
+    k32.OpenEventW.restype = ctypes.c_void_p
 EVENT_NAME = "Local\\NoPopFensterZeigen"
 
 
 def schon_offen():
     """True, wenn NoPop schon läuft – dann wird dort das Fenster geöffnet."""
+    if not WIN:
+        return lx.schon_offen()
     k32.CreateMutexW(None, False, "Local\\NoPopEinzeln")
     if k32.GetLastError() == 183:  # ERROR_ALREADY_EXISTS
         h = k32.OpenEventW(0x0002, False, EVENT_NAME)
@@ -192,6 +215,8 @@ class App:
         self.tray_aktualisieren()
 
     def _auf_zweite_instanz_warten(self):
+        if not WIN:
+            return lx.auf_zweite_instanz_warten(lambda: self.q.put("zeigen"))
         h = k32.CreateEventW(None, False, False, EVENT_NAME)
         while True:
             k32.WaitForSingleObject(ctypes.c_void_p(h), 0xFFFFFFFF)
@@ -208,7 +233,7 @@ class App:
             except Exception:
                 pass
             zeigen = True
-        elif autostart_an() and os.path.abspath(__file__) not in _schtasks("/Query", "/TN", AUFGABE, "/XML").stdout:
+        elif autostart_an() and autostart_veraltet():
             try:  # NoPop wurde verschoben/neu installiert -> Autostart auf diesen Ort umstellen
                 autostart_setzen(True)
             except Exception:
@@ -241,7 +266,10 @@ class Fenster:
         r.configure(bg=BG)
         r.resizable(False, False)
         try:
-            r.iconbitmap(asset("nopop.ico"))
+            if WIN:
+                r.iconbitmap(asset("nopop.ico"))
+            else:
+                r.iconphoto(True, tk.PhotoImage(file=asset("logo-512.png")).subsample(4))
         except Exception:
             pass
         self.k = r.winfo_fpixels("1i") / 96  # DPI-Faktor
@@ -315,6 +343,8 @@ class Fenster:
         for ev in ("<Return>", "<FocusOut>", "<KP_Enter>"):
             self.min_feld.bind(ev, lambda _: self._minuten())
         self.min_feld.bind("<MouseWheel>", self._rad)
+        self.min_feld.bind("<Button-4>", lambda _: self._minuten_setzen(self.e.get("minuten") + 1))
+        self.min_feld.bind("<Button-5>", lambda _: self._minuten_setzen(self.e.get("minuten") - 1))
 
         # Farbe
         rechts = zeile(1, t("Farbe", "Color"))
@@ -326,13 +356,18 @@ class Fenster:
         self._farben_zeichnen()
 
         # Autostart
-        rechts = zeile(2, t("Mit Windows starten", "Start with Windows"))
+        rechts = zeile(2, t("Mit Windows starten", "Start with Windows") if WIN
+                       else t("Automatisch starten", "Start automatically"))
         self.schalter = tk.Canvas(rechts, width=self.px(34), height=self.px(18), bg=BG, highlightthickness=0,
                                   cursor="hand2")
         self.schalter.pack()
         self.schalter.bind("<Button-1>", lambda _: self._autostart())
         self._schalter_zeichnen()
 
+        if not WIN:
+            tk.Label(f, text=t("Fenster zu = läuft weiter. Wieder öffnen: App-Menü → NoPop",
+                               "Closing keeps it running. Reopen: app menu → NoPop"),
+                     bg=BG, fg=DIM, font=("Segoe UI", 8)).pack(pady=(0, self.px(4)))
         ende = tk.Label(f, text=t("NoPop beenden", "Quit NoPop"), bg=BG, fg=DIM, font=("Segoe UI", 9), cursor="hand2")
         ende.pack(pady=(0, self.px(10)))
         ende.bind("<Button-1>", lambda _: self.beenden())
@@ -454,6 +489,11 @@ class Fenster:
         """Unten rechts über der Taskleiste, wie ein Tray-Fenster."""
         r = self.root
         r.update_idletasks()
+        if not WIN:
+            b = max(r.winfo_reqwidth(), self.px(270))
+            r.geometry(f"{b}x{r.winfo_reqheight()}")
+            return
+        import ctypes.wintypes
         rect = ctypes.wintypes.RECT()
         ctypes.windll.user32.SystemParametersInfoW(0x30, 0, ctypes.byref(rect), 0)  # Arbeitsbereich
         b = max(r.winfo_reqwidth(), self.px(270))
@@ -483,9 +523,10 @@ class Fenster:
 if __name__ == "__main__":
     if schon_offen():
         sys.exit(0)
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(1)
-    except Exception:
-        pass
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("NoPop.App")
+    if WIN:
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        except Exception:
+            pass
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("NoPop.App")
     App().run(zeigen="--versteckt" not in sys.argv)
