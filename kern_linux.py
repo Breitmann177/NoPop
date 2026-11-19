@@ -90,6 +90,10 @@ class Ton:
     def stopp(self):
         p, self.proc = self.proc, None
         if p:
+            try:
+                p.stdin.close()
+            except OSError:
+                pass
             p.terminate()
             try:
                 p.wait(2)
