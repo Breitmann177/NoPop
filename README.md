@@ -10,16 +10,9 @@
 </p>
 
 <p align="center">
+  <a href="../../releases/latest/download/NoPop-Setup.exe"><b>⬇ Download NoPop for Windows</b></a> ·
   <a href="README.de.md">Deutsch</a>
 </p>
-
-<p align="center">
-  <a href="https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Setup.exe"><img src="https://img.shields.io/badge/%E2%86%93%20Windows-0078D4?style=for-the-badge" alt="Download for Windows"></a>
-  &nbsp;
-  <a href="https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Linux.tar.gz"><img src="https://img.shields.io/badge/%E2%86%93%20Linux-E95420?style=for-the-badge" alt="Download for Linux"></a>
-</p>
-
-<p align="center"><sub><b>Windows:</b> double-click <code>NoPop-Setup.exe</code> &nbsp;·&nbsp; <b>Linux:</b> extract → <code>./install.sh</code></sub></p>
 
 ---
 
@@ -53,36 +46,20 @@ When nothing has played for that long, NoPop lets the speakers sleep again and w
 
 ## Install
 
-### Windows
-
-**[⬇ Download NoPop-Setup.exe](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Setup.exe)** → double-click → done.
+**[⬇ Download NoPop-Setup.exe](../../releases/latest/download/NoPop-Setup.exe)** → double-click → done.
 
 No admin rights, no extra software. NoPop opens and sits in the system tray (click **^** next to the clock).
 
 **"Windows protected your PC"?** Click **More info → Run anyway**. NoPop is free and not signed with a paid
 certificate; all its code is in this repository.
 
-**Blocked by Smart App Control?** Download [NoPop-Windows.zip](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Windows.zip) instead,
+**Blocked by Smart App Control?** Download the ZIP from the [latest release](../../releases/latest) instead,
 right-click → **Extract All**, double-click **`Install.cmd`**. It only runs the official, signed Python from python.org.
-
-### Linux
-
-Download [NoPop-Linux.tar.gz](https://github.com/Breitmann177/NoPop/releases/latest/download/NoPop-Linux.tar.gz), extract it, open a terminal in the folder and run:
-
-```bash
-./install.sh
-```
-
-It installs for your user only (no root), adds NoPop to your app menu and starts it. If Python/Tkinter or
-`pactl` are missing, it offers to install them. Works with PipeWire and PulseAudio. There is no tray icon on
-Linux: closing the window keeps NoPop running, open it again from the app menu.
 
 ## Uninstall
 
 **Settings → Apps → Installed apps → NoPop → Uninstall.** This removes the program, its autostart entry,
 Start menu entry and settings.
-
-**Linux:** run `~/.local/share/nopop/uninstall.sh`.
 
 ## FAQ
 
@@ -111,9 +88,7 @@ opop.iss   # build dist/NoPop-Setup.exe (Inno Setup 6)
 | File | Purpose |
 |---|---|
 | `nopop.py` | app, window (tkinter), settings, autostart |
-| `kern.py` | keep-awake logic and the inaudible tone |
-| `kern_win.py` / `kern_linux.py` | sound detection and playback (Windows COM / PipeWire-PulseAudio) |
-| `system_linux.py` | Linux autostart and single instance |
+| `kern.py` | sound detection (Windows audio meter via COM) and the inaudible keep-awake tone |
 | `tray.py` | tray icon via the Windows API |
 | `texte.py` | German / English texts |
 | `packaging/` | build script, Setup (Inno Setup), ZIP installer |
